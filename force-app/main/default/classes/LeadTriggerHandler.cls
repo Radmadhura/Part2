@@ -18,6 +18,7 @@ public with sharing class LeadTriggerHandler {
 
 
     public void handleAfterInsert(){
+        System.debug('In handleAfterInsert' + hasRunOnce);
         if(hasRunOnce){
             return;
         }
@@ -28,6 +29,7 @@ public with sharing class LeadTriggerHandler {
     }
 
      public void handleAfterUpdate(){
+         System.debug('In handleAfterUpdate' + hasRunOnce);
         if(hasRunOnce){
             return;
         }
@@ -39,13 +41,14 @@ public with sharing class LeadTriggerHandler {
 
     public void CreateTaskforLead()
     {
+        
+         System.debug('In CreateTaskforLead' + hasRunOnce);
         List<Task> lstTask = new List<Task>();
-        Set<Id> leadIdsWithStatusChange = new Set<Id>();
+        Set<Id> leadIdsWithPrdIntChange = new Set<Id>();
         id userid = UserInfo.GetUserId();
 
         if(Trigger.isInsert)//if triggered is fired on inserting the record
-        {
-        
+        {        
             for(Lead l: NewLeads)
             {
                 //Create a new Task for each lead              
@@ -61,20 +64,20 @@ public with sharing class LeadTriggerHandler {
         {
             for(lead nl: NewLeads)
             {  
-                if(nl.Status != OldLeadmaps.get(nl.Id).Status)
+                if(nl.ProductInterest__c != OldLeadmaps.get(nl.Id).ProductInterest__c)
                 {
                     //add leadid to the list whose status has been changed
-                    leadIdsWithStatusChange.add(nl.Id);
+                    leadIdsWithPrdIntChange.add(nl.Id);
 
                     //Update Task for updated status of lead
                     Task t = new Task();
-                    t = AddTask(nl,OldLeadmaps.get(nl.Id).Status,userid);
+                    t = AddTask(nl,OldLeadmaps.get(nl.Id).ProductInterest__c,userid);
                     lstTask.add(t);                    
                 }
             }
              
             // 1. Query for existing tasks related to the leads
-            List<Task> oldtasksToUpdate = [SELECT Id FROM Task WHERE WhoId IN :leadIdsWithStatusChange];
+            List<Task> oldtasksToUpdate = [SELECT Id FROM Task WHERE WhoId IN :leadIdsWithPrdIntChange];
             for(task t: oldtasksToUpdate)
             {
                 t.Status = 'Completed';
@@ -87,16 +90,16 @@ public with sharing class LeadTriggerHandler {
     }
 
     //Create a task object and return
-    Public Task AddTask(lead objLead, string oldstatus,Id userid)
+    Public Task AddTask(lead objLead, string oldprdstatus,Id userid)
     {
         Task t = new Task();
-        t.WhatId = objLead.Id;
-        t.Subject = 'Follow up on Lead ' + objLead.name;
+        t.WhoId = objLead.Id;
+        t.Subject = 'Follow up on Lead ' + objLead.FirstName + ' ' + objLead.LastName ;
         t.Status = 'Not Started';
-        if(String.isBlank(oldstatus))
-            t.Description = 'Lead interest is in ' + objLead.Status;            
+        if(String.isBlank(oldprdstatus))
+            t.Description = 'Lead interest is in ' + objLead.ProductInterest__c;            
         else
-            t.Description = 'Lead interest has been changed from ' + oldstatus + ' to ' + objLead.Status;
+            t.Description = 'Lead interest has been changed from ' + oldprdstatus + ' to ' + objLead.ProductInterest__c;
         t.Priority = 'Normal';
         t.Ownerid = userid;
         
