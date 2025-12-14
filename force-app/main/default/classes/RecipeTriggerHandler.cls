@@ -64,6 +64,7 @@ public with sharing class RecipeTriggerHandler {
         //Validate draft flag
         for (Recipe__c recipe : listRecipe)
         {     
+             System.debug('In recipe' + recipe);
             if(String.isEmpty(recipe.Name) || recipe.Active_Time__c.intValue() == 0 || String.isEmpty(recipe.Description__c) || recipe.Servings__c.intValue() == 0)
                 recipe.Draft__c = true;
             else

@@ -79,4 +79,78 @@ public class TestFactory {
         insert u;
         return u;
     }
+
+    public static Recipe__c generateRecipe(String name, String description, integer iComplexity, Boolean doInsert ) 
+    {
+        Recipe__c r = new Recipe__c(
+            Name = name,
+            Description__c = description
+        );
+        //compare interger iComplexity to set recipe fields for complexity
+
+        if(iComplexity == 0)//Simple
+        {
+            r.Active_Time__c = 5;
+            r.Active_Time_Units__c = 'Minutes';
+            r.Servings__c = 3;
+        }
+        else if(iComplexity == 1)//Moderate
+        {
+            r.Active_Time__c = 30;
+            r.Active_Time_Units__c = 'Minutes';
+            r.Servings__c = 7;  
+        }
+        else if(iComplexity == 2)//Difficult
+        {
+            r.Active_Time__c = 2;
+            r.Active_Time_Units__c = 'Hours';
+            r.Servings__c = 15;  
+        }
+
+        if (doInsert) {
+            insert r;
+        }
+        return r;
+    }
+
+    public static cookbook__c generateCookbook(
+        String name,
+        String status,
+        Boolean doInsert
+    ) {
+        cookbook__c cb = new cookbook__c(
+            Name = name,
+            Status__c = status
+        );
+        if (doInsert) {
+            insert cb;
+        }
+        return cb;
+    }
+
+    public static void getrecipeWithCookbookWithDraft(String recipeName, String cookbookName,integer Complexity) 
+    {
+        Recipe__c rec = generateRecipe(recipeName, recipeName + ' Draft Desciption', Complexity, true);
+        cookbook__c cb = generateCookbook(cookbookName, 'Draft', true);
+
+        Recipe_Usage__c ru = new Recipe_Usage__c(
+            Recipe__c = rec.Id,
+            Cookbook__c = cb.Id
+        );
+        insert ru;  
+    }
+
+     public static void getrecipeWithCookbookWithPublished(String recipeName, String cookbookName,integer Complexity) 
+        {
+        Recipe__c rec = generateRecipe(recipeName, recipeName + ' Published Desciption',Complexity, true);
+        cookbook__c cb = generateCookbook(cookbookName, 'Published',true);
+
+        Recipe_Usage__c ru = new Recipe_Usage__c(
+            Recipe__c = rec.Id,
+            Cookbook__c = cb.Id
+        );
+        insert ru;  
+    }
 }
+
+   
