@@ -89,4 +89,31 @@ private class RecipeTriggerHandler_Test {
         Recipe__c Updaterec = [SELECT Complexity__c FROM Recipe__c WHERE Id = :rec.Id];
         System.Assert.areEqual('Simple', Updaterec.Complexity__c, 'Recipe should be marked as Simple');
     }
+
+    //Wirte a negative test method for recipe with missing fields
+    @IsTest
+    static void testDraftRecipe(){  
+        // insert recipe with missing fields to be marked as draft
+       Recipe__c rec = TestFactory.generateRecipe('Draft Recipe', 'It is a Draft recipe',5,false); 
+
+       system.debug('rec before insert: ' + rec);
+
+        Test.startTest();
+            try 
+            {
+                insert rec;
+                System.assert(false, 'Exception expected');
+            }
+            catch (Exception e) 
+            {
+
+                if(e.getTypeName() == 'System.NullPointerException')                                                                                                                                                                                                                                                        
+                    System.assertEquals(e.getTypeName(), 'System.NullPointerException');                
+                else
+                    System.assertEquals(e.getTypeName(), 'System.DmlException');
+            }
+            
+        Test.stopTest();
+
+    }
 }

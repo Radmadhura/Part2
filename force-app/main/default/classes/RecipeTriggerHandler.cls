@@ -64,24 +64,34 @@ public with sharing class RecipeTriggerHandler {
         //Validate draft flag
         for (Recipe__c recipe : listRecipe)
         {     
+            
              System.debug('In recipe' + recipe);
             if(String.isEmpty(recipe.Name) || recipe.Active_Time__c.intValue() == 0 || String.isEmpty(recipe.Description__c) || recipe.Servings__c.intValue() == 0)
+            {
                 recipe.Draft__c = true;
+
+                iComplexity = HelperFunctions.rateRecipeComplexity(recipe);
+
+                //Check Complexity of the recipe
+                if(iComplexity ==3)
+                    recipe.Complexity__c = 'Difficult';
+                else if(iComplexity ==2)
+                    recipe.Complexity__c = 'Moderate';
+                else
+                    recipe.Complexity__c = 'Simple';
+
+            }
             else
+            {
                 recipe.Draft__c = false;
+                recipe.addError(                  
+                    'Please fill all required field!'
+                );
+            }
+        
+        }        
     
-        iComplexity = HelperFunctions.rateRecipeComplexity(recipe);
-
-        //Check Complexity of the recipe
-        if(iComplexity ==3)
-            recipe.Complexity__c = 'Difficult';
-        else if(iComplexity ==2)
-            recipe.Complexity__c = 'Moderate';
-        else
-            recipe.Complexity__c = 'Simple';
-        }                
     }
-
     
     //Create a Task for the Cookbook recipe
     public void CreateTaskforRecipeAndCookBooks(Map<Id,Recipe__c> listRecipeMaps){
