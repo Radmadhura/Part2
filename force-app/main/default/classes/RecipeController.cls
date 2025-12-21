@@ -52,4 +52,46 @@ public inherited sharing class RecipeController {
         System.debug('returning: ' + recipes);
         return recipes;
     }
+     @AuraEnabled
+    public static void addIngredient(String ingredientName, Decimal measurementAmount, String measurementType, ID recipeId){
+
+        //checking ingredient parameters
+        if(ingredientName.trim() == null || measurementType.trim() == '' || measurementAmount == null){
+            throw new AuraHandledException('Ingredient name cannot be empty.');
+        }
+        else 
+        {
+            // Insert the ingredient
+            Ingredient__c newIngredient = new Ingredient__c(
+            Name = ingredientName,
+            Measurement__c = measurementAmount,
+            Measurement_Type__c = measurementType,
+            Recipe__c = recipeId);
+
+            insert newIngredient;
+        }
+        
+    }
+
+    @AuraEnabled
+    public static List <Ingredient__c> generateGroceryList(ID recipeId){
+        // Load the ingredients and return them
+        List<Ingredient__c> ingredients = [SELECT Id, Name, Measurement__c, Measurement_Type__c, Recipe__c FROM Ingredient__c WHERE Recipe__c = :recipeId];
+        if(ingredients.size() > 0){
+            return ingredients;
+        }
+        return ingredients;
+    }
+
+    @AuraEnabled
+    public static List <Ingredient__c> scaleRecipeForServings (ID recipeId, Decimal desiredServings) {
+        // Scale the recipe and return the list of scaled ingredients
+        List<Ingredient__c> ingredients = [SELECT Id, Name, Measurement__c, Measurement_Type__c, Recipe__c FROM Ingredient__c WHERE Recipe__c = :recipeId];
+       
+        for (Ingredient__c i : ingredients) {
+            i.Measurement__c = desiredServings;    
+        }   
+        return ingredients;
+    }
+
 }

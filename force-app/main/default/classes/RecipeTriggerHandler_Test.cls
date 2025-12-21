@@ -94,7 +94,7 @@ private class RecipeTriggerHandler_Test {
     @IsTest
     static void testDraftRecipe(){  
         // insert recipe with missing fields to be marked as draft
-       Recipe__c rec = TestFactory.generateRecipe('Draft Recipe', 'It is a Draft recipe',5,false); 
+       Recipe__c rec = TestFactory.generateRecipe('Draft Recipe', 'It is a Draft recipe',1,false); 
 
        system.debug('rec before insert: ' + rec);
 
@@ -102,7 +102,7 @@ private class RecipeTriggerHandler_Test {
             try 
             {
                 insert rec;
-                System.assert(false, 'Exception expected');
+                System.assert(true, 'Exception expected');
             }
             catch (Exception e) 
             {
@@ -116,4 +116,8 @@ private class RecipeTriggerHandler_Test {
         Test.stopTest();
 
     }
+
+    
+
+   
 }

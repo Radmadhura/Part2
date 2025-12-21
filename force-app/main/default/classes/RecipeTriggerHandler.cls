@@ -69,8 +69,16 @@ public with sharing class RecipeTriggerHandler {
             if(String.isEmpty(recipe.Name) || recipe.Active_Time__c.intValue() == 0 || String.isEmpty(recipe.Description__c) || recipe.Servings__c.intValue() == 0)
             {
                 recipe.Draft__c = true;
+            }
+            else
+            {
+                recipe.Draft__c = false;
 
-                iComplexity = HelperFunctions.rateRecipeComplexity(recipe);
+                //Commented code as we do not need to throw an exeception now
+                //recipe.addError( 'Please fill all required field!');
+            }
+
+             iComplexity = HelperFunctions.rateRecipeComplexity(recipe);
 
                 //Check Complexity of the recipe
                 if(iComplexity ==3)
@@ -80,14 +88,6 @@ public with sharing class RecipeTriggerHandler {
                 else
                     recipe.Complexity__c = 'Simple';
 
-            }
-            else
-            {
-                recipe.Draft__c = false;
-                recipe.addError(                  
-                    'Please fill all required field!'
-                );
-            }
         
         }        
     
