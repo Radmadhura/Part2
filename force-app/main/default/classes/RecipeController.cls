@@ -88,8 +88,10 @@ public inherited sharing class RecipeController {
         // Scale the recipe and return the list of scaled ingredients
         List<Ingredient__c> ingredients = [SELECT Id, Name, Measurement__c, Measurement_Type__c, Recipe__c FROM Ingredient__c WHERE Recipe__c = :recipeId];
        
+        Integer intserv = desiredServings.setScale(0, System.RoundingMode.HALF_UP).intValue();
+
         for (Ingredient__c i : ingredients) {
-            i.Measurement__c = desiredServings;    
+            i.Measurement__c = intserv;    
         }   
         return ingredients;
     }
